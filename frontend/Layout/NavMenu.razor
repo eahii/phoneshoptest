@@ -1,0 +1,74 @@
+﻿<!-- UsedPhoneShop/frontend/Layout/NavMenu.razor -->
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Used Phones Web Shop</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/register" Match="NavLinkMatch.Prefix">
+                <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Rekisteröidy
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/login" Match="NavLinkMatch.Prefix">
+                <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Kirjaudu sisään
+            </NavLink>
+        </div>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/logout" Match="NavLinkMatch.Prefix">
+                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Kirjaudu ulos
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/admin">
+                        <span class="bi bi-gear" aria-hidden="true"></span> Admin Dashboard
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <!-- Optionally, display alternative links for unauthenticated users -->
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/phones">
+                <span class="bi bi-phone" aria-hidden="true"></span> Puhelimet
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/cart">
+                <span class="bi bi-cart" aria-hidden="true"></span> Ostoskori
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

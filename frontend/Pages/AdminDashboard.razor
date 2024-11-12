@@ -1,0 +1,19 @@
+@page "/admin"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>Admin Dashboard</h3>
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <p>Welcome, Admin! Here you can manage users, view reports, etc.</p>
+        <!-- Add admin functionalities here -->
+    </Authorized>
+    <NotAuthorized>
+        <p>You do not have access to this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    // Additional logic if needed
+}

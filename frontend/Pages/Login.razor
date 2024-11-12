@@ -1,0 +1,101 @@
+@page "/login"
+@using Shared.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using frontend.Services
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+
+@inject HttpClient Http
+@inject CustomAuthenticationStateProvider CustomAuthStateProvider
+@inject LocalStorageService LocalStorageService
+
+<h3>Kirjaudu sisään</h3>
+
+@if (User != null)
+{
+    <h4>Tervetuloa, @User.FirstName @User.LastName!</h4>
+    <button @onclick="Logout">Logout</button>
+}
+else
+{
+    <div>
+        <label>Sähköposti:</label>
+        <input @bind="Email" />
+    </div>
+    <div>
+        <label>Salasana:</label>
+        <input type="password" @bind="Password" />
+    </div>
+    <div>
+        <button @onclick="LoginUser">Kirjaudu</button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p>@Message</p>
+}
+
+@code {
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string Message { get; set; } = string.Empty;
+    private UserModel? User { get; set; }
+
+    private async Task LoginUser()
+    {
+        var loginRequest = new LoginRequest { Email = Email, Password = Password };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/auth/login", loginRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                if (result != null)
+                {
+                    await LocalStorageService.SetItem("token", result.Token);
+                    User = result.User;
+                    Message = "Kirjautuminen onnistui!";
+                    CustomAuthStateProvider.NotifyUserAuthentication(result.Token); // Notify authentication state
+                }
+            }
+            else
+            {
+                var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                Message = error?.Error ?? "Kirjautuminen epäonnistui. Tarkista sähköposti ja salasana.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Virhe kirjautuessa: {ex.Message}";
+        }
+    }
+
+    private async Task Logout()
+    {
+        User = null;
+        Message = "Olet kirjautunut ulos.";
+        await LocalStorageService.RemoveItem("token");
+        CustomAuthStateProvider.NotifyUserLogout(); // Notify logout
+    }
+}
+
+@code {
+    public class LoginResponse
+    {
+        public string Token { get; set; }
+        public UserModel User { get; set; }
+    }
+
+    public class ErrorResponse
+    {
+        public string Error { get; set; }
+    }
+
+    public class LoginRequest
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}

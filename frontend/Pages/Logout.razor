@@ -1,0 +1,21 @@
+@page "/logout"
+@using Microsoft.AspNetCore.Components.Authorization
+@using frontend.Services
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject LocalStorageService LocalStorageService
+@inject CustomAuthenticationStateProvider CustomAuthStateProvider
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LocalStorageService.RemoveItem("token");
+        CustomAuthStateProvider.NotifyUserLogout(); // Notify logout
+
+        // Redirect to homepage after logout
+        Navigation.NavigateTo("/", true);
+    }
+}
